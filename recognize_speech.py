@@ -1,13 +1,20 @@
 import speech_recognition as sr
+import sounddevice as sd
+import numpy as np
 
 def recognize_speech_from_mic(recognizer, microphone):
-    with microphone as source:
-        print("Say something...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
+    fs = 44100  # Sample rate
+    duration = 5  # Duration of recording
+
+    print("Say something...")
+    print("Recording...")
+    recording = sd.rec(int(duration * fs), samplerate=fs, channels=2, dtype='int16')
+    sd.wait()  # Wait until recording is finished
+    audio_data = np.array(recording, dtype=np.int16)
 
     try:
         print("Recognizing...")
+        audio = sr.AudioData(audio_data.tobytes(), fs, 2)
         text = recognizer.recognize_google(audio)
         return text
     except sr.UnknownValueError:
@@ -18,11 +25,10 @@ def recognize_speech_from_mic(recognizer, microphone):
 
 if __name__ == "__main__":
     recognizer = sr.Recognizer()
-    microphone = sr.Microphone()
 
     while True:
         try:
-            text = recognize_speech_from_mic(recognizer, microphone)
+            text = recognize_speech_from_mic(recognizer, None)
             if text:
                 print(f"Text: {text}")
         except KeyboardInterrupt:
