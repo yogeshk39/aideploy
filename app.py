@@ -17,18 +17,8 @@ def recognize_speech_from_audio_file(audio_file):
     except sr.RequestError as e:
         return f"Error during request to Google Speech Recognition service: {e}"
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    transcript = ""
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return render_template('index.html', transcript="No file part.")
-        file = request.files['file']
-        if file.filename == '':
-            return render_template('index.html', transcript="No selected file.")
-        if file:
-            transcript = recognize_speech_from_audio_file(file)
-    return render_template('index.html', transcript=transcript)
-
+    return render_template('index.html')
 if __name__ == "__main__":
     app.run(debug=True)
